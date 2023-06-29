@@ -52,7 +52,7 @@ def parse_sheet(type):
         gid = '990091517'
 
         raw = get_master(sheet_id, gid)
-        df = raw[['card_title','card_url','script_cascade_helper']].copy()
+        df = raw[['card_title','card_url','back_url','script_cascade_helper']].copy()
         df['tts_name'] = df.apply(lambda r: r['card_title'] + '\n' + r['script_cascade_helper'], axis=1)
         df = df.reset_index(drop=True)
         return df
@@ -61,7 +61,7 @@ def parse_sheet(type):
         gid = '2139880948'
 
         raw = get_master(sheet_id, gid)
-        df = raw[['card_title','card_url','script_cascade_helper']].copy()
+        df = raw[['card_title','card_url','back_url','script_cascade_helper']].copy()
         df['tts_name'] = df.apply(lambda r: r['card_title'] + '\n' + r['script_cascade_helper'], axis=1)
         df = df.reset_index(drop=True)
         return df
@@ -88,54 +88,54 @@ def std_transform():
 
 def contained_object(df, type, back_url):
     ContainedObjects = []
-    if type == 'cube':
-        for i, row in df.iterrows():
-            if pd.isna(row['back_url']):
-                card = {
-                    'CardID': row['CardID'],
-                    'Name': 'Card',
-                    "Nickname": row['tts_name'],
-                    "Transform": std_transform()
-                }
-                ContainedObjects.append(card)
-            else:
-                CustomDeck_front = {}
-                CustomDeck_front[row['card_number']] = {
-                    'FaceURL': row['card_url'],
-                    'BackURL': back_url,
-                    'NumHeight': 1,
-                    'NumWidth': 1,
-                    "BackIsHidden": True,
-                    "UniqueBack": False,
-                    "Type": 0
-                }
-                CustomDeck_back = {}
-                CustomDeck_back[row['card_number']] = {
-                    'FaceURL': row['back_url'],
-                    'BackURL': back_url,
-                    'NumHeight': 1,
-                    'NumWidth': 1,
-                    "BackIsHidden": True,
-                    "UniqueBack": False,
-                    "Type": 0
-                }
-                card = {
-                    'CardID': row['CardID'],
-                    'Name': 'Card',
-                    "Nickname": row['tts_name'],
-                    "Transform": std_transform(),
-                    "CustomDeck": CustomDeck_front,
-                    "States": {
-                        "2": {
-                            "Name": "Card",
-                            "Transform": std_transform(),
-                            "Nickname": row['tts_name'],
-                            "CardID": row['CardID'],
-                            "CustomDeck": CustomDeck_back
-                        }
+    for i, row in df.iterrows():
+        if pd.isna(row['back_url']):
+            card = {
+                'CardID': row['CardID'],
+                'Name': 'Card',
+                "Nickname": row['tts_name'],
+                "Transform": std_transform()
+            }
+            ContainedObjects.append(card)
+        else:
+            CustomDeck_front = {}
+            CustomDeck_front[row['card_number']] = {
+                'FaceURL': row['card_url'],
+                'BackURL': back_url,
+                'NumHeight': 1,
+                'NumWidth': 1,
+                "BackIsHidden": True,
+                "UniqueBack": False,
+                "Type": 0
+            }
+            CustomDeck_back = {}
+            CustomDeck_back[row['card_number']] = {
+                'FaceURL': row['back_url'],
+                'BackURL': back_url,
+                'NumHeight': 1,
+                'NumWidth': 1,
+                "BackIsHidden": True,
+                "UniqueBack": False,
+                "Type": 0
+            }
+            card = {
+                'CardID': row['CardID'],
+                'Name': 'Card',
+                "Nickname": row['tts_name'],
+                "Transform": std_transform(),
+                "CustomDeck": CustomDeck_front,
+                "States": {
+                    "2": {
+                        "Name": "Card",
+                        "Transform": std_transform(),
+                        
+                        "Nickname": row['tts_name'],
+                        "CardID": row['CardID'],
+                        "CustomDeck": CustomDeck_back
                     }
                 }
-                ContainedObjects.append(card)
+            }
+            ContainedObjects.append(card)
     return ContainedObjects
 
 def custom_deck(df, back_url):
