@@ -8,7 +8,7 @@ import fun
 back_url = 'https://customcards.s3.us-east-2.amazonaws.com/card_back.jpg'
 
 #%% parse arguments
-options = ['cube','tokens','lands']
+options = ['cube','tokens','lands','packs']
 type = None
 if len(sys.argv) <= 1:
     print('No args provided. Options are: {}'.format(', '.join(options)))
@@ -21,9 +21,16 @@ else:
     if not type:
         print('No valid arguments. Options are: {}'.format(', '.join(options)))
 
+
 #%% Get data from the proper sheet. 
 # Remove excess columns, filter unused rows, create proper card title
 df = fun.parse_sheet(type)
+
+
+#%% Make packs if the option for it was selected
+if type == 'packs':
+    df = fun.make_packs(pack_size = 12, num_packs=16, threshold=1.1, df=df)
+
 
 #%%
 # Add additional columns that the json deck will need
